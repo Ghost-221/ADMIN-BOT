@@ -2,18 +2,20 @@ import asyncio
 import logging
 import aiosqlite
 import os
+import sys
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # --- কনফিগারেশন ---
-API_TOKEN = "YOUR_BOT_TOKEN_HERE"  # আপনার বটের টোকেন দিন
+# ⚠️ সতর্কতা: আপনার আগের টোকেনটি পাবলিক হয়ে গেছে। BotFather থেকে নতুন টোকেন নিয়ে নিচে বসান।
+API_TOKEN = "8527942527:AAE-PI-rJ1eVVeQp7Cr-bUOw_C7kQ86IGcw" 
 
-# একাধিক অ্যাডমিনের ID এখানে কমা (,) দিয়ে লিখুন
-ADMIN_IDS = [123456789, 987654321, 1122334455] 
+# একাধিক অ্যাডমিনের ID
+ADMIN_IDS = [6872143322, 8363437161] 
 
 # --- লগিং এবং সেটআপ ---
 logging.basicConfig(level=logging.INFO)
@@ -67,17 +69,34 @@ async def cmd_start(message: types.Message):
     # ইউজার সেভ করা
     await add_user(message.from_user)
     
-    # ওয়েলকাম মেসেজ
-    welcome_msg = (
-        f"আসসালামু আলাইকুম, {message.from_user.first_name}! ❤️\n\n"
-        "আমাদের অফিসিয়াল বটে আপনাকে স্বাগতম।\n"
-        "যেকোনো আপডেটের জন্য আমাদের সাথেই থাকুন।"
-    )
+    # ওয়েলকাম মেসেজ (সঠিক ফরম্যাটিং সহ)
+    welcome_msg = f"""আসসালামু আলাইকুম, {message.from_user.first_name}! ❤️
+
+আমাদের অফিসিয়াল বটে আপনাকে স্বাগতম।
+আমি HELIX বাংলাদেশ নাগরিক সেবা এজেন্ট।
+বাংলাদেশের নাগরিকদের জন্য দ্রুত, সহজ ও নিরাপদে বিভিন্ন সেবা পৌঁছে দেওয়াই আমাদের মূল লক্ষ্য।
+
+আপনি যদি বাংলাদেশের নাগরিক হয়ে থাকেন, তাহলে আমাদের সেবা আপনার জন্য অবশ্যই উপকারী।
+আমাদের মিনি অ্যাপে এখনই রেজিস্ট্রেশন করে নিন এবং ঘরে বসেই উপভোগ করুন নানা গুরুত্বপূর্ণ সেবা খুব সহজে ও ঝামেলাহীনভাবে।
+
+✅ যেকোনো অভিযোগ, অনুযোগ, পরামর্শ বা রিপোর্ট করার জন্য
+✅ আমাদের এজেন্টের সাথে লাইভ কথা বলার জন্য
+
+নিচে দেওয়া ইউজারনেমে ক্লিক করে আমাদের মেসেজ করুন।
+প্রথম মেসেজে শুধু Hi অথবা Hello লিখুন।
+
+আমাদের এডমিন স্যার খুব দ্রুত আপনার মেসেজের রিপ্লাই দেবেন, ইনশাআল্লাহ।
+টেলিগ্রাম @Helix_Panel 
+মিনি এপ @Silent_Cyber_Raid_Bot
+
+ধন্যবাদ।
+HELIX বাংলাদেশ নাগরিক সেবা
+আপনার সেবাই আমাদের অঙ্গীকার"""
+    
     await message.answer(welcome_msg)
 
 # --- ২. অ্যাডভান্সড অ্যাডমিন প্যানেল ---
 
-# অ্যাডমিন মেইন মেনু ফাংশন
 async def send_admin_panel(message: types.Message):
     total_users = await get_stats()
     
@@ -98,7 +117,6 @@ async def send_admin_panel(message: types.Message):
 
 @dp.message(Command("admin"))
 async def cmd_admin(message: types.Message):
-    # চেক করা হচ্ছে ইউজার ID আমাদের অ্যাডমিন লিস্টে আছে কিনা
     if message.from_user.id in ADMIN_IDS:
         await send_admin_panel(message)
 
@@ -106,7 +124,6 @@ async def cmd_admin(message: types.Message):
 
 @dp.callback_query(F.data.startswith("admin_"))
 async def admin_callbacks(call: types.CallbackQuery, state: FSMContext):
-    # বাটন চাপলে চেক করবে সে অ্যাডমিন কিনা
     if call.from_user.id not in ADMIN_IDS:
         return
 
@@ -134,7 +151,10 @@ async def admin_callbacks(call: types.CallbackQuery, state: FSMContext):
                 f.write(f"{user[0]}\n")
         
         await call.message.answer_document(FSInputFile(filename), caption="📂 All User IDs")
-        os.remove(filename) 
+        try:
+            os.remove(filename)
+        except:
+            pass
 
     elif action == "broadcast":
         await call.message.answer("📢 অনুগ্রহ করে আপনার ব্রডকাস্ট মেসেজটি দিন (Text, Photo, Video supported):")
@@ -145,19 +165,16 @@ async def admin_callbacks(call: types.CallbackQuery, state: FSMContext):
 
 @dp.message(AdminState.waiting_for_broadcast_content)
 async def process_broadcast_content(message: types.Message, state: FSMContext):
-    # মেসেজ দেওয়ার সময় আবার অ্যাডমিন চেক
     if message.from_user.id not in ADMIN_IDS:
         return
 
-    # মেসেজ টেম্পোরারি সেভ করা
     await state.update_data(msg_id=message.message_id, chat_id=message.chat.id)
 
-    # প্রিভিউ এবং কনফার্ম বাটন
     kb = InlineKeyboardBuilder()
     kb.button(text="✅ Send Broadcast", callback_data="confirm_send")
     kb.button(text="❌ Cancel", callback_data="cancel_send")
 
-    # প্রিভিউ দেখানো (যিনি মেসেজ দিচ্ছেন তাকেই দেখাবে)
+    # Copy message to show preview
     await message.copy_to(chat_id=message.from_user.id) 
     await message.answer("👆 উপরে আপনার মেসেজের প্রিভিউ। আপনি কি এটা সবাইকে পাঠাতে চান?", reply_markup=kb.as_markup())
     await state.set_state(AdminState.waiting_for_confirm)
@@ -169,7 +186,6 @@ async def confirm_broadcast_send(call: types.CallbackQuery, state: FSMContext):
         await state.clear()
         return
 
-    # ব্রডকাস্ট শুরু
     data = await state.get_data()
     msg_id = data['msg_id']
     from_chat = data['chat_id']
@@ -184,14 +200,12 @@ async def confirm_broadcast_send(call: types.CallbackQuery, state: FSMContext):
     
     for user in users:
         try:
-            # যিনি ব্রডকাস্ট শুরু করেছেন তার চ্যাট থেকে কপি হবে
             await bot.copy_message(chat_id=user[0], from_chat_id=from_chat, message_id=msg_id)
             success += 1
-            await asyncio.sleep(0.05) 
+            await asyncio.sleep(0.05) # Flood wait protection
         except Exception:
             blocked += 1
             
-    # রিপোর্ট পাঠানো (যিনি সেন্ড করেছেন তাকে)
     await bot.send_message(
         call.from_user.id,
         f"🎉 **Broadcast Completed!**\n\n"
@@ -199,16 +213,18 @@ async def confirm_broadcast_send(call: types.CallbackQuery, state: FSMContext):
         f"🚫 Failed/Blocked: {blocked}",
         parse_mode="Markdown"
     )
-    await status_msg.delete() # লোডিং মেসেজ ডিলিট
+    await status_msg.delete()
     await state.clear()
 
 # --- রানার ---
 async def main():
     await init_db()
-    print("Bot is running with Multi-Admin Support...")
+    print("Bot is running...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
