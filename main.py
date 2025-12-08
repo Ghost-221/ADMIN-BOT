@@ -85,7 +85,7 @@ async def cmd_start(message: types.Message):
 
 আমাদের এডমিন স্যার খুব দ্রুত আপনার মেসেজের রিপ্লাই দেবেন, ইনশাআল্লাহ।
 টেলিগ্রাম @Helix_Panel 
-মিনি এপ @Silent_Cyber_Raid_Bot
+মিনি এপ @ShellShockRobot
 
 ধন্যবাদ।
 HELIX বাংলাদেশ নাগরিক সেবা
