@@ -16,7 +16,7 @@ from aiohttp import web  # ওয়েব সার্ভারের জন্য
 API_TOKEN = os.getenv("BOT_TOKEN")  
 
 # অ্যাডমিন লিস্ট
-ADMIN_IDS = [6872143322, 8363437161] 
+ADMIN_IDS = [6872143322, 8363437161, 7931424304, 6698901002] 
 
 # --- লগিং এবং সেটআপ ---
 logging.basicConfig(level=logging.INFO)
