@@ -13,7 +13,7 @@ from aiohttp import web  # ওয়েব সার্ভারের জন্য
 
 # --- কনফিগারেশন ---
 # টোকেনটি সরাসরি এখানে না বসিয়ে Render এর Environment Variable এ বসানো নিরাপদ
-API_TOKEN = os.getenv("BOT_TOKEN")  
+API_TOKEN = os.getenv("8556754012:AAFMpc7lW-Y-osWwP1ZPmi6RFTEn9gqRvZQ")  
 
 # অ্যাডমিন লিস্ট
 ADMIN_IDS = [6872143322, 8363437161, 7931424304, 6698901002] 
