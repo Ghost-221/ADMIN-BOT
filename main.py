@@ -12,10 +12,10 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiohttp import web  # ওয়েব সার্ভারের জন্য
 
 # --- কনফিগারেশন ---
-# আপনার দেওয়া টোকেনটি এখানে বসানো হয়েছে
-API_TOKEN = "8556754012:AAFMpc7lW-Y-osWwP1ZPmi6RFTEn9gqRvZQ"
+# টোকেনটি সরাসরি এখানে না বসিয়ে Render এর Environment Variable এ বসানো নিরাপদ
+API_TOKEN = os.getenv("BOT_TOKEN")  
 
-# অ্যাডমিন লিস্ট (এখানে আপনার টেলিগ্রাম আইডি থাকা আবশ্যক, নাহলে /admin কাজ করবে না)
+# অ্যাডমিন লিস্ট
 ADMIN_IDS = [6872143322, 8363437161, 7931424304, 6698901002] 
 
 # --- লগিং এবং সেটআপ ---
@@ -89,7 +89,7 @@ async def cmd_start(message: types.Message):
 
 ধন্যবাদ।
 HELIX বাংলাদেশ নাগরিক সেবা
-আপনার সেবাই আমাদের অঙ্গীকার
+আপনার সেবাই আমাদের অঙ্গীকার
 """
     await message.answer(welcome_msg)
 
